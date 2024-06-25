@@ -10,11 +10,32 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(
-            Product::with('productModel.brand')->paginate(10)
-        );
+        request()->validate([
+            'perPage' => ['nullable', 'integer'],
+            'search' => ['nullable'],
+        ]);
+
+        $perPage = $request->perPage ?? 10;
+        $searchValue = $request->search ?? null;
+
+        $productQuery = Product::with('productModel.brand');
+        if ($searchValue) {
+            $productQuery
+                ->orWhere('product_id', 'like', "%{$searchValue}%")
+                ->orWhere('type', 'like', "%{$searchValue}%")
+                ->orWhere('capacity', 'like', "%{$searchValue}%")
+                ->orWhere('quantity', 'like', "%{$searchValue}%")
+                ->orWhereHas('productModel', function ($query) use ($searchValue) {
+                    $query->where('name', 'like', "%{$searchValue}%")
+                        ->orWhereHas('brand', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', "%{$searchValue}%");
+                        });
+                });
+        }
+
+        return response()->json($productQuery->paginate($perPage));
     }
 
     public function syncProduct(Request $request)
