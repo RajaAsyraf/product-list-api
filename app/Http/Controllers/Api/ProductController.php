@@ -7,6 +7,7 @@ use App\Jobs\SyncProductSyncFileUploaded;
 use App\Models\Product;
 use App\Models\ProductSyncFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -40,9 +41,16 @@ class ProductController extends Controller
 
     public function syncProduct(Request $request)
     {
-        request()->validate([
-            'product_sync_file' => ['required', 'mimes:xlsx'],
-        ]);
+        Validator::make(
+            [
+                'product_sync_file' => $request->product_sync_file,
+                'extension' => strtolower($request->product_sync_file->getClientOriginalExtension()),
+            ],
+            [
+                'product_sync_file' => ['required'],
+                'extension' => ['required', 'in:xlsx,xls'],
+            ]
+        )->validate();
 
         $filenameWithExt = $request->file('product_sync_file')->getClientOriginalName();
         $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
