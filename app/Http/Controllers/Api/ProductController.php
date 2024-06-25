@@ -57,6 +57,6 @@ class ProductController extends Controller
 
         SyncProductSyncFileUploaded::dispatch($file);
 
-        return redirect()->route('home');
+        return response()->json();
     }
 }
