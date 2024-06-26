@@ -13,9 +13,10 @@ To install this in your local machine, we can utilize Docker container to instal
 4. Run `./vendor/bin/sail up -d` to spin up the docker container. This will spin up Laravel container and MySQL database.
 ![alt text](image.png)
 5. Once the container is up, you can connect into the container using the container name by running this `docker exec -it product-list-api-laravel.test-1 bash`.
-3. Next, you can execute the following commands:
+6. Next, you can execute the following commands:
   - Run migration `php artisan migrate`.
   - Run seeder `php artisan db:seed`.
+7. Run `php artisan queue:listen` to listen to process jobs from the default queue.
 
 At this point, the API is now ready to serve the request from frontend. You may submit a request against this URL `http://localhost/api/product`.
 
