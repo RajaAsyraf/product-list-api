@@ -1,6 +1,10 @@
 ### Product List API
 This repository is the backend to serve api for Product List application using Laravel 10 and MySQL database.
 
+### Database design
+Here is the database design to store the product master list.
+![alt text](image-1.png)
+
 ### Installation
 To install this in your local machine, we can utilize Docker container to install the defined tools and packages. Assuming Composer and Docker are ready in your machine, you can proceed with these steps:
 1. Open root directory in the terminal and run `composer install`.
