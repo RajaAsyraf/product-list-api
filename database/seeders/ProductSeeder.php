@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Brand;
-use App\Enums\ProductTypeEnum;
-use App\Models\ProductModel;
+use App\Services\ProductService;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -28,7 +26,7 @@ class ProductSeeder extends Seeder
                 'type' => 'Smartphone',
                 'model' => 'iPhone SE',
                 'capacity' => '2GB/32GB',
-                 'brand' => 'Apple',
+                'brand' => 'Apple',
                 'quantity' => 30,
             ],
             [
@@ -36,7 +34,7 @@ class ProductSeeder extends Seeder
                 'type' => 'Smartphone',
                 'model' => 'iPhone SE',
                 'capacity' => '2GB/64GB',
-                 'brand' => 'Apple',
+                'brand' => 'Apple',
                 'quantity' => 20,
             ],
             [
@@ -44,7 +42,7 @@ class ProductSeeder extends Seeder
                 'type' => 'Smartphone',
                 'model' => 'iPhone SE',
                 'capacity' => '2GB/128GB',
-                 'brand' => 'Apple',
+                'brand' => 'Apple',
                 'quantity' => 16,
             ],
             [
@@ -52,25 +50,13 @@ class ProductSeeder extends Seeder
                 'type' => 'Smartphone',
                 'model' => 'iPhone SE (2020)',
                 'capacity' => '3GB/64GB',
-                 'brand' => 'Apple',
+                'brand' => 'Apple',
                 'quantity' => 18,
             ],
         ]);
 
         $products->each(function ($productData) {
-            $brand = Brand::firstOrCreate([
-                'name' => $productData['brand']
-            ]);
-            $productModel = ProductModel::firstOrCreate([
-                'name' => $productData['model'],
-                'brand_id' => $brand->id,
-            ]);
-            $productModel->products()->create([
-                'product_id' => $productData['product_id'],
-                'type' => ProductTypeEnum::from($productData['type'])->value,
-                'capacity' => $productData['capacity'],
-                'quantity' => $productData['quantity'],
-            ]);
+            ProductService::createProduct($productData);
         });
     }
 }

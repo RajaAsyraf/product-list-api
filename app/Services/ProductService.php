@@ -7,10 +7,17 @@ use App\Enums\ProductTypeEnum;
 use App\Models\Brand;
 use App\Models\Product;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 
 class ProductService
 {
-    public static function syncProduct(Collection $rows)
+    /**
+     * Sync product data
+     *
+     * @param Collection $rows
+     * @return void
+     */
+    public static function syncProduct(Collection $rows): void
     {
         $rows->each(function ($row) {
             $data = [
@@ -38,8 +45,33 @@ class ProductService
         });
     }
 
-    private static function createProduct(Array $data): Product
+    /**
+     * Create product with model & brand
+     *
+     * @param array<string> $data
+     * @return Product
+     */
+    public static function createProduct(array $data): Product
     {
+        Validator::make(
+            [
+                'brand'         => $data['brand'] ?? null,
+                'model'         => $data['model'] ?? null,
+                'product_id'    => $data['product_id'] ?? null,
+                'type'          => $data['type'] ?? null,
+                'capacity'      => $data['product_id'] ?? null,
+                'quantity'      => $data['quantity'] ?? null,
+            ],
+            [
+                'brand'         => ['required', 'max:255'],
+                'model'         => ['required', 'max:255'],
+                'product_id'    => ['required', 'integer', 'max:99999'],
+                'type'          => ['required', 'max:255'],
+                'capacity'      => ['required', 'max:255'],
+                'quantity'      => ['nullable', 'integer'],
+            ]
+        )->validate();
+
         return Brand::firstOrCreate([
             'name' => $data['brand'],
         ])
@@ -50,6 +82,7 @@ class ProductService
             'product_id' => $data['product_id'],
             'type' => ProductTypeEnum::from($data['type'])->value,
             'capacity' => $data['capacity'],
+            'quantity' => $data['quantity'] ?? 0,
         ]);
     }
 }
