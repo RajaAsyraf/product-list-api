@@ -8,7 +8,11 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class ProductImport implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * @param Collection $rows
+     * @return void
+     */
+    public function collection(Collection $rows): void
     {
         $rows->shift();
         ProductService::syncProduct($rows);

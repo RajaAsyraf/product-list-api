@@ -6,40 +6,51 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SyncProductSyncFileUploaded;
 use App\Models\Product;
 use App\Models\ProductSyncFile;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Returns all products
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request): JsonResponse
     {
         request()->validate([
             'perPage' => ['nullable', 'integer'],
             'search' => ['nullable'],
         ]);
 
-        $perPage = $request->perPage ?? 10;
-        $searchValue = $request->search ?? null;
-
         $productQuery = Product::with('productModel.brand');
-        if ($searchValue) {
+
+        if ($search = $request->search ?? null) {
             $productQuery
-                ->orWhere('product_id', 'like', "%{$searchValue}%")
-                ->orWhere('type', 'like', "%{$searchValue}%")
-                ->orWhere('capacity', 'like', "%{$searchValue}%")
-                ->orWhere('quantity', 'like', "%{$searchValue}%")
-                ->orWhereHas('productModel', function ($query) use ($searchValue) {
-                    $query->where('name', 'like', "%{$searchValue}%")
-                        ->orWhereHas('brand', function ($query) use ($searchValue) {
-                            $query->where('name', 'like', "%{$searchValue}%");
+                ->orWhere('product_id', 'like', "%{$search}%")
+                ->orWhere('type', 'like', "%{$search}%")
+                ->orWhere('capacity', 'like', "%{$search}%")
+                ->orWhere('quantity', 'like', "%{$search}%")
+                ->orWhereHas('productModel', function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhereHas('brand', function ($query) use ($search) {
+                            $query->where('name', 'like', "%{$search}%");
                         });
                 });
         }
 
-        return response()->json($productQuery->paginate($perPage));
+        return response()->json($productQuery->paginate($request->perPage ?? 10));
     }
 
-    public function syncProduct(Request $request)
+    /**
+     * Create and update product details in bulk
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function syncProduct(Request $request): JsonResponse
     {
         Validator::make(
             [
