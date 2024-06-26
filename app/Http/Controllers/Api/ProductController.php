@@ -65,6 +65,8 @@ class ProductController extends Controller
 
         SyncProductSyncFileUploaded::dispatch($file);
 
-        return response()->json();
+        return response()->json([
+            'message' => 'Success! The file has been uploaded!'
+        ]);
     }
 }
