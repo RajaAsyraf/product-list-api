@@ -16,6 +16,7 @@
         </style>
     </head>
     <body>
+        <h1>Test Upload Forms</h1>
         <form action="/api/product-sync" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="file" name="product_sync_file" id="product_sync_file">
